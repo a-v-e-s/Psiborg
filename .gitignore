@@ -1,3 +1,4 @@
 # ignore pycache and .pyc files
 __pycache__/
 *.pyc
+db.sqlite
