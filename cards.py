@@ -5,8 +5,9 @@ global cpu_choice, successes, attempts
 successes, attempts = 0, 0
 options = []
 
+test_num = 1
 statement = """
-CREATE TABLE """ + test_num + """(
+CREATE TABLE """ + str(test_num) + """(
     Number INTEGER NOT NULL,
     Guess INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     Correct INTEGER NOT NULL,
@@ -49,7 +50,7 @@ def game():
     post.grid(row=1, column=4)
     pre.select()
 
-    img_circle = tk.PhotoImage(file="images/circle.gif")
+    img_circle = tk.PhotoImage(master=root, file="images/circle.gif")
     options.append(img_circle)
     circle = tk.Canvas(root, width=141, height=169)
     circle.create_image(70, 84, image=img_circle)
@@ -57,7 +58,7 @@ def game():
     choose_circle = tk.Button(root, text="Choose", command=functools.partial(human_choice, img_circle, mode, ratio, wins, tries))
     choose_circle.grid(row=3, column=1)
 
-    img_cross = tk.PhotoImage(file="images/cross.gif")
+    img_cross = tk.PhotoImage(master=root, file="images/cross.gif")
     options.append(img_cross)
     cross = tk.Canvas(root, width=141, height=169)
     cross.create_image(70, 84, image=img_cross)
@@ -65,7 +66,7 @@ def game():
     choose_cross = tk.Button(root, text="Choose", command=functools.partial(human_choice, img_cross, mode, ratio, wins, tries))
     choose_cross.grid(row=3, column=2)
 
-    img_waves = tk.PhotoImage(file="images/waves.gif")
+    img_waves = tk.PhotoImage(master=root, file="images/waves.gif")
     options.append(img_waves)
     waves = tk.Canvas(root, width=141, height=169)
     waves.create_image(70, 84, image=img_waves)
@@ -73,7 +74,7 @@ def game():
     choose_waves = tk.Button(root, text="Choose", command=functools.partial(human_choice, img_waves, mode, ratio, wins, tries))
     choose_waves.grid(row=3, column=3)
 
-    img_square = tk.PhotoImage(file="images/square.gif")
+    img_square = tk.PhotoImage(master=root, file="images/square.gif")
     options.append(img_square)
     square = tk.Canvas(root, width=141, height=169)
     square.create_image(70, 84, image=img_square)
@@ -81,7 +82,7 @@ def game():
     choose_square = tk.Button(root, text="Choose", command=functools.partial(human_choice, img_square, mode, ratio, wins, tries))
     choose_square.grid(row=3, column=4)
 
-    img_star = tk.PhotoImage(file="images/star.gif")
+    img_star = tk.PhotoImage(master=root, file="images/star.gif")
     options.append(img_star)
     star = tk.Canvas(root, width=141, height=169)
     star.create_image(70, 84, image=img_star)
