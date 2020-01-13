@@ -112,6 +112,11 @@ def feedback(name, start_time, child=None, lock=None):
             child.send('Begin!')
             lock.release()
         while True:
+            if child.poll():
+                if child.recv() == 'Done!':
+                    print('parent says Done!')
+                    save_and_exit(name, start_time, data)
+                    break
 
             """ 3.1 ACQUIRE DATA """
             # Obtain EEG data from the LSL stream
@@ -159,18 +164,18 @@ def feedback(name, start_time, child=None, lock=None):
                 ]
             }
             data.append(bands)
-            print('Delta: ' + str(bands[timestamp][0][0]))
-            print('Theta: ' + str(bands[timestamp][0][1]))
-            print('Alpha: ' + str(bands[timestamp][0][2]))
-            print('Beta: ' + str(bands[timestamp][0][3]))
-            print('Gamma: ' + str(bands[timestamp][0][4]))
             #yield data
 
     except KeyboardInterrupt:
-        print('Saving and Closing!')
-        pkl_name = 'EEGs/' + name.get().replace(' ', '_') + '/zener/' + start_time + '.pkl'
-        with open(pkl_name, 'wb') as f:
-            pickle.dump(data, f)
+        save_and_exit(name, start_time, data)
+
+
+def save_and_exit(name, start_time, data):
+    print('Saving and Closing!')
+    pkl_name = 'EEGs/' + name.get().replace(' ', '_') + '/zener/' + start_time + '.pkl'
+    with open(pkl_name, 'wb') as f:
+        pickle.dump(data, f)
+    exit()
 
 
 if __name__ == '__main__':

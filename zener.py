@@ -5,7 +5,9 @@ from time import time
 from sqlite3 import Connection
 
 class Game():
-    def __init__(self, mode, name, mood, start_time):
+    def __init__(self, mode, name, mood, start_time, parent):
+        self.parent = parent
+        print('Creating Game now!')
         self.attempts = 0
         self.options = []
         self.data = {}
@@ -69,10 +71,10 @@ class Game():
             self.cpu_choice = choice(self.options)
         if img == self.cpu_choice:
             success = 1
-            print('Psychic!')
+            #print('Psychic!')
         else:
             success = 0
-            print('Dunce!')
+            #print('Dunce!')
         self.data[self.attempts] = [str(success), str(timestamp)]
         att.configure(text=str(self.attempts)+'/25')
         if self.attempts == 25:
@@ -83,6 +85,7 @@ class Game():
 
 
     def record_data(self, mode, name, mood):
+        self.parent.send('Done!')
         for x in self.data.keys():
             print('Attempt #:', str(x))
             print(self.data[x][1] + ': ' + self.data[x][0])
@@ -92,13 +95,13 @@ class Game():
             _type = 'zener_precognition'
         elif mode.get() == 2:
             _type = 'zener_clairvoyance'
-        filepath = 'EEGs/' + name.get().replace(' ', '_') + '/zener/' +
+        filepath = 'EEGs/' + name.get().replace(' ', '_') + '/zener/'
         tests_insert = (
             'insert into Tests (Name, Mood, Type, CSV_filepath) ' +
             'Values ("'+name.get()+'", "'+mood.get('1.0', 'end')+'", "'+_type+'", "'+filepath+'");'
         )
         print(tests_insert)
-        ##curs.execute(tests_insert)
+        curs.execute(tests_insert)
         try:
             test_num = str(curs.execute('select max(Number) from Tests;').fetchall()[0][0] + 1)
         except TypeError:
@@ -112,14 +115,15 @@ class Game():
         Timestamp REAL NOT NULL
         );"""
         print(create_test)
-        ##curs.execute(create_test)
+        curs.execute(create_test)
         for x in self.data.keys():
             created_insert = (
                 'INSERT INTO '+table_name+' (Number, Guess, Correct, Timestamp) ' +
                 'Values ('+test_num+', '+str(x)+', '+self.data[x][0]+', '+self.data[x][1]+');'
             )
             print(created_insert)
-        ##curs.execute(created_insert)
+            curs.execute(created_insert)
 
+        db.commit()
         curs.close()
         db.close()

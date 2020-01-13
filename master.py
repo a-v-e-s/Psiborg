@@ -64,14 +64,14 @@ class Master():
             raise ValueError('You must enter a name')
         if mood.get('1.0', 'end') == '' or mood.get('1.0', 'end') == '':
             raise ValueError('You must describe your state of mind')
-        begin(mode, name, mood)
+        self.begin(mode, name, mood)
     
-    def begin(mode, name, mood):
+    def begin(self, mode, name, mood):
         if name.get().replace(' ', '_') not in os.listdir('EEGs'):
             os.mkdir('EEGs/' + name.get().replace(' ', '_'))
             os.mkdir('EEGs/' + name.get().replace(' ', '_') + '/zener/')
         elif 'zener' not in os.listdir('EEGs/' + name.get().replace(' ', '_')):
-            os.mkdir('EEGs/' + name.get().replace(' ', '_') + '/zener/'))
+            os.mkdir('EEGs/' + name.get().replace(' ', '_') + '/zener/')
         start_time = str(datetime.now()).replace(' ', '_')
         parent, child = Pipe()
         lock = Lock()
@@ -82,7 +82,8 @@ class Master():
             raise RuntimeError('Failed to find EEG stream.')
         else:
             print('Found EEG stream, continuing...')
-        t2 = Thread(target=Game, args=(mode, name, mood, start_time))
+        t1 = Thread(target=Game, args=(mode, name, mood, start_time, parent))
+        t1.start()
 
 
 if __name__ == '__main__':
