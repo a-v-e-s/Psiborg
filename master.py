@@ -1,7 +1,11 @@
+import os
 import tkinter as tk
 from functools import partial
 from zener import Game
 from threading import Thread
+from multiprocessing import Process, Pipe, Lock
+from neurofeedback import feedback
+from datetime import datetime
 
 class Master():
     def __init__(self):
@@ -31,30 +35,54 @@ class Master():
         mood.grid(row=5, column=1, columnspan=4)
 
         eeg = tk.IntVar()
+        record = tk.IntVar()
         l_confirm = tk.Label(root, text='Confirm good EEG connection:')
         l_confirm.grid(row=6, column=1, columnspan=2)
         confirm = tk.Checkbutton(root, variable=eeg, offvalue=0, onvalue=1, fg='black')
         confirm.grid(row=6, column=3, columnspan=2)
+        l_confirm2 = tk.Label(root, text='Confirm recording via muselsl+record and/or neurofeedback.py:')
+        l_confirm2.grid(row=7, column=1, columnspan=2)
+        confirm2 = tk.Checkbutton(root, variable=record, offvalue=0, onvalue=1, fg='black')
+        confirm2.grid(row=7, column=3, columnspan=2)
 
-        start = tk.Button(root, text='Start Test!', command=partial(self.validate, mode, eeg, name, mood))
-        start.grid(row=7, column=2)
+        start = tk.Button(root, text='Start Test!', command=partial(self.validate, mode, eeg, record, name, mood))
+        start.grid(row=8, column=2)
         stop = tk.Button(root, text='Quit', command=root.destroy)
-        stop.grid(row=7, column=3)
+        stop.grid(row=8, column=3)
 
         name.focus_set()
         root.mainloop()
     
-    def validate(self, mode, eeg, name, mood):
+    def validate(self, mode, eeg, record, name, mood):
         if eeg.get() != 1:
             raise ValueError('You must confirm a good EEG connection')
+        if record.get() != 1:
+            raise ValueError('You must confirm that EEG data is recording!')
         if mode.get() == 0:
             raise ValueError('You must choose a game mode')
         if name.get() == '':
             raise ValueError('You must enter a name')
-        if mood.get('1.0', 'end') == '' or mood.get('1.0', 'end') == 'Please briefly describe your state of mind:':
+        if mood.get('1.0', 'end') == '' or mood.get('1.0', 'end') == '':
             raise ValueError('You must describe your state of mind')
-        t = Thread(target=Game, args=(mode, name, mood))
-        t.start()
+        begin(mode, name, mood)
+    
+    def begin(mode, name, mood):
+        if name.get().replace(' ', '_') not in os.listdir('EEGs'):
+            os.mkdir('EEGs/' + name.get().replace(' ', '_'))
+            os.mkdir('EEGs/' + name.get().replace(' ', '_') + '/zener/')
+        elif 'zener' not in os.listdir('EEGs/' + name.get().replace(' ', '_')):
+            os.mkdir('EEGs/' + name.get().replace(' ', '_') + '/zener/'))
+        start_time = str(datetime.now()).replace(' ', '_')
+        parent, child = Pipe()
+        lock = Lock()
+        print('starting neurofeedback')
+        p1 = Process(target=feedback, args=(name, start_time, child, lock))
+        p1.start()
+        if parent.recv() == 'Fail':
+            raise RuntimeError('Failed to find EEG stream.')
+        else:
+            print('Found EEG stream, continuing...')
+        t2 = Thread(target=Game, args=(mode, name, mood, start_time))
 
 
 if __name__ == '__main__':

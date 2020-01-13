@@ -8,5 +8,8 @@ then wait for it to connect and stream...
 python3 -m muselsl view -b Qt5Agg
 -b Qt5Agg option necessary to change the backend on blacktop; may not be necessary on other machines.
 #
-then once the graphs have stabilized:
-python3 -m muselsl record -d < # of seconds you want to record for >
+then once the graphs have stabilized, in EEGs repo:
+python3 -m muselsl record -d < number of seconds you want to record for >
+#
+for custome neurofeedback data, in base folder of repo:
+python3 neurofeedback.py

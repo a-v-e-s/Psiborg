@@ -5,7 +5,7 @@ from time import time
 from sqlite3 import Connection
 
 class Game():
-    def __init__(self, mode, name, mood):
+    def __init__(self, mode, name, mood, start_time):
         self.attempts = 0
         self.options = []
         self.data = {}
@@ -92,7 +92,7 @@ class Game():
             _type = 'zener_precognition'
         elif mode.get() == 2:
             _type = 'zener_clairvoyance'
-        filepath = 'EEGs/i\ dunno\ yet'
+        filepath = 'EEGs/' + name.get().replace(' ', '_') + '/zener/' +
         tests_insert = (
             'insert into Tests (Name, Mood, Type, CSV_filepath) ' +
             'Values ("'+name.get()+'", "'+mood.get('1.0', 'end')+'", "'+_type+'", "'+filepath+'");'
