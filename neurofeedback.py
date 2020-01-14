@@ -37,7 +37,8 @@ class Band:
 
 
 def feedback(name, start_time, child=None, lock=None):
-    lock.acquire()
+    if lock:
+        lock.acquire()
 
     """ EXPERIMENTAL PARAMETERS """
     # Modify these to change aspects of the signal processing
@@ -112,11 +113,12 @@ def feedback(name, start_time, child=None, lock=None):
             child.send('Begin!')
             lock.release()
         while True:
-            if child.poll():
-                if child.recv() == 'Done!':
-                    print('parent says Done!')
-                    save_and_exit(name, start_time, data)
-                    break
+            if child:
+                if child.poll():
+                    if child.recv() == 'Done!':
+                        print('parent says Done!')
+                        save_and_exit(name, start_time, data)
+                        break
 
             """ 3.1 ACQUIRE DATA """
             # Obtain EEG data from the LSL stream
@@ -181,7 +183,8 @@ def save_and_exit(name, start_time, data):
 if __name__ == '__main__':
     import tkinter
     from datetime import datetime
-    name = tkinter.StringVar()
+    root = tkinter.Tk()
+    name = tkinter.StringVar(root)
     name.set('Jon David')
     start_time = str(datetime.now()).replace(' ', '_')
     feedback(name, start_time)
