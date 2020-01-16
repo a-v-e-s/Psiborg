@@ -7,7 +7,7 @@ from multiprocessing import Process, Pipe, Lock
 from neurofeedback import feedback
 from datetime import datetime
 
-class Master():
+class Games():
     def __init__(self):
         root = tk.Tk()
         root.title('Control Panel')
@@ -87,4 +87,4 @@ class Master():
 
 
 if __name__ == '__main__':
-    Master()
+    Games()
