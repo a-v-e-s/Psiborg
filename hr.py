@@ -40,7 +40,7 @@ def hr_monitor(name, start_time, heart_child=None, heart_lock=None):
     while True:
         if heart_child:
             if heart_child.poll():
-                if heart_child.recv('Done!'):
+                if heart_child.recv() == 'Done!':
                     print('Parent says Done!')
                     break
         
@@ -57,12 +57,15 @@ def hr_monitor(name, start_time, heart_child=None, heart_lock=None):
             pulse_times.append(now)
             pulse_values.append(value)
         elif bite.startswith(b'Q'):
-            if value < (ibi_values[-1] * 0.67):
-                pulse_times.pop()
-                pulse_values.pop()
-                continue
-            elif value > (ibi_values[-1] * 1.5):
-                continue
+            try:
+                if value < (ibi_values[-1] * 0.67):
+                    pulse_times.pop()
+                    pulse_values.pop()
+                    continue
+                elif value > (ibi_values[-1] * 1.5):
+                    continue
+            except IndexError:
+                pass
             ibi_times.append(now)
             ibi_values.append(value)
         else:

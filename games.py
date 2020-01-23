@@ -47,7 +47,7 @@ class Games():
         confirm2 = tk.Checkbutton(root, variable=record, offvalue=0, onvalue=1, fg='black')
         confirm2.grid(row=7, column=3, columnspan=2)
         l_confirm3 = tk.Label(root, text='ECG connected or skipped?')
-        l_confirm3.gri(row=8, column=1, columnspan=2)
+        l_confirm3.grid(row=8, column=1, columnspan=2)
         confirm3 = tk.Checkbutton(root, variable=ecg, offvalue=0, onvalue=1, fg='black')
         confirm3.grid(row=8, column=3, columnspan=2)
 
