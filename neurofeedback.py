@@ -36,9 +36,9 @@ class Band:
     Gamma = 4
 
 
-def feedback(name, start_time, child=None, lock=None):
-    if lock:
-        lock.acquire()
+def feedback(name, start_time, brain_child=None, brain_lock=None):
+    if brain_lock:
+        brain_lock.acquire()
 
     """ EXPERIMENTAL PARAMETERS """
     # Modify these to change aspects of the signal processing
@@ -66,9 +66,9 @@ def feedback(name, start_time, child=None, lock=None):
     print('Looking for an EEG stream...')
     streams = resolve_byprop('type', 'EEG', timeout=2)
     if len(streams) == 0:
-        if child:
-            child.send('Fail')
-            lock.release()
+        if brain_child:
+            brain_child.send('Fail')
+            brain_lock.release()
         raise RuntimeError('Can\'t find EEG stream.')
 
     # Set active EEG stream to inlet and apply time correction
@@ -109,13 +109,13 @@ def feedback(name, start_time, child=None, lock=None):
     data = []
     try:
         # The following loop acquires data, computes band powers, and calculates neurofeedback metrics based on those band powers
-        if child:
-            child.send('Begin!')
-            lock.release()
+        if brain_child:
+            brain_child.send('Begin!')
+            brain_lock.release()
         while True:
-            if child:
-                if child.poll():
-                    if child.recv() == 'Done!':
+            if brain_child:
+                if brain_child.poll():
+                    if brain_child.recv() == 'Done!':
                         print('parent says Done!')
                         save_and_exit(name, start_time, data)
                         break

@@ -5,6 +5,7 @@ from zener import Game
 from threading import Thread
 from multiprocessing import Process, Pipe, Lock
 from neurofeedback import feedback
+from hr import hr_monitor
 from datetime import datetime
 
 class Games():
@@ -36,6 +37,7 @@ class Games():
 
         eeg = tk.IntVar()
         record = tk.IntVar()
+        ecg = tk.IntVar()
         l_confirm = tk.Label(root, text='Confirm good EEG connection:')
         l_confirm.grid(row=6, column=1, columnspan=2)
         confirm = tk.Checkbutton(root, variable=eeg, offvalue=0, onvalue=1, fg='black')
@@ -44,26 +46,33 @@ class Games():
         l_confirm2.grid(row=7, column=1, columnspan=2)
         confirm2 = tk.Checkbutton(root, variable=record, offvalue=0, onvalue=1, fg='black')
         confirm2.grid(row=7, column=3, columnspan=2)
+        l_confirm3 = tk.Label(root, text='ECG connected or skipped?')
+        l_confirm3.gri(row=8, column=1, columnspan=2)
+        confirm3 = tk.Checkbutton(root, variable=ecg, offvalue=0, onvalue=1, fg='black')
+        confirm3.grid(row=8, column=3, columnspan=2)
 
-        start = tk.Button(root, text='Start Test!', command=partial(self.validate, mode, eeg, record, name, mood))
-        start.grid(row=8, column=2)
+        start = tk.Button(root, text='Start Test!', command=partial(self.validate, mode, eeg, record, ecg, name, mood))
+        start.grid(row=9, column=2)
         stop = tk.Button(root, text='Quit', command=root.destroy)
-        stop.grid(row=8, column=3)
+        stop.grid(row=9, column=3)
 
         name.focus_set()
         root.mainloop()
     
-    def validate(self, mode, eeg, record, name, mood):
+    def validate(self, mode, eeg, record, ecg, name, mood):
         if eeg.get() != 1:
-            raise ValueError('You must confirm a good EEG connection')
+            raise ValueError('You must confirm a good EEG connection!')
         if record.get() != 1:
             raise ValueError('You must confirm that EEG data is recording!')
+        if ecg.get() != 1:
+            raise ValueError('You must confirm that ECG is connected or is being skipped!')
         if mode.get() == 0:
-            raise ValueError('You must choose a game mode')
+            raise ValueError('You must choose a game mode!')
         if name.get() == '':
-            raise ValueError('You must enter a name')
+            raise ValueError('You must enter a name!')
         if mood.get('1.0', 'end') == '' or mood.get('1.0', 'end') == '':
             raise ValueError('You must describe your state of mind')
+
         self.begin(mode, name, mood)
     
     def begin(self, mode, name, mood):
@@ -73,16 +82,29 @@ class Games():
         elif 'zener' not in os.listdir('EEGs/' + name.get().replace(' ', '_')):
             os.mkdir('EEGs/' + name.get().replace(' ', '_') + '/zener/')
         start_time = str(datetime.now()).replace(' ', '_')
-        parent, child = Pipe()
-        lock = Lock()
+
+        brain_parent, brain_child = Pipe()
+        heart_parent, heart_child = Pipe()
+        brain_lock = Lock()
+        heart_lock = Lock()
+
         print('starting neurofeedback')
-        p1 = Process(target=feedback, args=(name, start_time, child, lock))
+        p1 = Process(target=feedback, args=(name, start_time, brain_child, brain_lock))
         p1.start()
-        if parent.recv() == 'Fail':
+        if brain_parent.recv() == 'Fail':
             raise RuntimeError('Failed to find EEG stream.')
         else:
             print('Found EEG stream, continuing...')
-        t1 = Thread(target=Game, args=(mode, name, mood, start_time, parent))
+        
+        print('starting ecg feedback')
+        p2 = Process(target=hr_monitor, args=(name, start_time, heart_child, heart_lock))
+        p2.start()
+        if heart_parent.recv() == 'Fail':
+            raise RuntimeError('Failed to find ECG stream.')
+        else:
+            print('Found ECG stream, continuing...')
+
+        t1 = Thread(target=Game, args=(mode, name, mood, start_time, brain_parent, heart_parent))
         t1.start()
 
 

@@ -1,8 +1,10 @@
-#! first make sure muse is connected via bluetooth.
+#! first make sure muse is connected via bluetooth, and arduino connected via USB
 
 =========================================================================================================================================
 
 # commands to enter to begin streaming, recording, and viewing muse data:
+#
+$ sudo chown crowbar:crowbar /dev/ttyACM0
 #
 $ python3 -m muselsl stream
 # then wait for it to connect and stream...

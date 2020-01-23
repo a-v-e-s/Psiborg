@@ -5,8 +5,9 @@ from time import time
 from sqlite3 import Connection
 
 class Game():
-    def __init__(self, mode, name, mood, start_time, parent):
-        self.parent = parent
+    def __init__(self, mode, name, mood, start_time, brain_parent, heart_parent):
+        self.brain_parent = brain_parent
+        self.heart_parent = heart_parent
         print('Creating Game now!')
         self.attempts = 0
         self.options = []
@@ -85,7 +86,8 @@ class Game():
 
 
     def record_data(self, mode, name, mood):
-        self.parent.send('Done!')
+        self.brain_parent.send('Done!')
+        self.heart_parent.send('Done!')
         for x in self.data.keys():
             print('Attempt #:', str(x))
             print(self.data[x][1] + ': ' + self.data[x][0])
