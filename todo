@@ -1,20 +1,24 @@
 ================================================================================================================
-Need a gui for examining eeg data with graphs
+{Need to figure out the math of what's going on and why delta is always > theta > alpha > beta > gamma,
+    as though i was always asleep while recording.
+    Is it the math or is it the muse that is crappy?};
 
-Need to figure out the math of what's going on and why delta is always > theta > alpha > beta > gamma,
-as though i was always asleep while recording.
-Is it the math or is it the muse that is crappy?
+interface {
+    {change name of games.py to master.py or control_panel.py or psiborg.py?
+        make games.py a subordinate of master.py / et al?};
+    {Need a gui for examining eeg data with graphs};
+};
 
-change name of games.py to master.py or control_panel.py or psiborg.py?
+heartrate {
+    {stop laptop from freezing at the end of game while gathering heartrate data.
+        Do I need to axe windows and install linux on the internal ssd?
+        I'll do it if I have to. eff microsoft.};
 
-fix hr data gathering because more than half of the time it is crap.
+    {fix hr data gathering because more than half of the time it is crap.};
 
-jupyter notebook for examining hr data
+    {jupyter notebook for examining hr data};
+};
 
-stop laptop from freezing at the end of game while gathering heartrate data.
-Do I need to axe windows and install linux on the internal ssd?
-I'll do it if I have to. eff microsoft.
-
-fix your sqlite database and data structure in general.
-create a new db if you need to.
+{fix your sqlite database and data structure in general.
+    create a new db if you need to.};
 ================================================================================================================

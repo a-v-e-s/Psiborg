@@ -1,13 +1,13 @@
+#!/usr/bin/python3.5
+
 import os, pickle, sqlite3
 import matplotlib.pyplot as plt
 import tkinter as tk
-from tkinter.filedialog import askopenfilename
-from threading import Thread
-from multiprocessing import cpu_count
-from time import sleep
+from argparse import ArgumentParser
+from multiprocessing import Process
 
 
-def power_plot(name, values, timestamps, width, height, corrects, incorrects, savefigs, directory, table=None):    
+def power_plot(name, values, timestamps, width, height, corrects, incorrects, directory, table=None):    
     plt.figure(figsize=(width,height))
     plt.suptitle(name)
     plt.plot(timestamps, values, color='black')
@@ -18,13 +18,12 @@ def power_plot(name, values, timestamps, width, height, corrects, incorrects, sa
             plt.axvline(x=a, color='purple')
         for b in incorrects:
             plt.axvline(x=b, color='orange')
-    if savefigs == True:
-        plt.save(os.path.join(directory, name))
-    else:
-        plt.show()
+    
+    plt.savefig(name)
+    plt.close()
 
 
-def ratio_plot(name, ratios, ceiling, timestamps, width, height, corrects, incorrects, savefigs, directory, table=None):
+def ratio_plot(name, ratios, ceiling, timestamps, width, height, corrects, incorrects, directory, table=None):
     remove_these = []
     new_timestamps = timestamps.copy()
     for x in range(len(ratios)):
@@ -44,13 +43,13 @@ def ratio_plot(name, ratios, ceiling, timestamps, width, height, corrects, incor
             new_timestamps.remove(new_timestamps[y])
         #
         print('ceiling busted!')
-        ceiling_busted(name, new_timestamps, limited_new_timestamps, ratios, limited_ratios, width, height, corrects, incorrects, savefigs, directory, table)
+        ceiling_busted(name, new_timestamps, limited_new_timestamps, ratios, limited_ratios, width, height, corrects, incorrects, directory, table)
     else:
         print('not busted')
-        not_busted(name, new_timestamps, ratios, width, height, corrects, incorrects, savefigs, directory, table)
+        not_busted(name, new_timestamps, ratios, width, height, corrects, incorrects, directory, table)
 
 
-def ceiling_busted(name, timestamps, limited_timestamps, ratio, limited_ratio, width, height, corrects, incorrects, savefigs, directory, table=None):
+def ceiling_busted(name, timestamps, limited_timestamps, ratio, limited_ratio, width, height, corrects, incorrects, directory, table=None):
     plt.figure(figsize=(width,height))
     plt.suptitle(name)
     plt.plot(timestamps, ratio, color='black')
@@ -62,13 +61,12 @@ def ceiling_busted(name, timestamps, limited_timestamps, ratio, limited_ratio, w
             plt.axvline(x=a, color='purple')
         for b in incorrects:
             plt.axvline(x=b, color='orange')
-    if savefigs == True:
-        plt.save(os.path.join(directory, name))
-    else:
-        plt.show()
+    
+    plt.savefig(name)
+    plt.close()
 
 
-def not_busted(name, timestamps, ratio, width, height, corrects, incorrects, savefigs, directory, table=None):
+def not_busted(name, timestamps, ratio, width, height, corrects, incorrects, directory, table=None):
     plt.figure(figsize=(width,height))
     plt.suptitle(name)
     plt.plot(timestamps, ratio, color='black')
@@ -79,29 +77,15 @@ def not_busted(name, timestamps, ratio, width, height, corrects, incorrects, sav
             plt.axvline(x=a, color='purple')
         for b in incorrects:
             plt.axvline(x=b, color='orange')
-    if savefigs == True:
-        plt.save(os.path.join(directory, name))
-    else:
-        plt.show()
+    
+    plt.savefig(name)
+    plt.close()
 
 
-def main():
-    filename = askopenfilename()
-    directory = os.path.dirname(filename)
-    with open(filename, 'rb') as f:
+def main(filepath, ceiling):
+    directory = os.path.dirname(os.path.abspath(filepath))
+    with open(filepath, 'rb') as f:
         data = pickle.load(f)
-
-    # when i get all of this straightened out...
-    if input('Save plotted figures? [y/n]').lower() == 'y':
-        savefigs = True
-    else:
-        savefigs = False
-
-    try:
-        ceiling = int(input('Set ceiling for busted ratio graphs: (pick an integer)'))
-    except ValueError:
-        print('Invalid input. Setting ceiling = 2')
-        ceiling = 2
 
     timestamps = []
     for x in range(len(data)):
@@ -125,7 +109,7 @@ def main():
         curs.close()
         db.close()
     
-    os.chdir(os.path.dirname(filename))
+    os.chdir(os.path.dirname(filepath))
 
     deltas = []
     thetas = []
@@ -212,52 +196,36 @@ def main():
     width = len(timestamps) // 5
     height = width // 5
     
-    universal_args = [timestamps, width, height, corrects, incorrects, savefigs, directory, table]
+    universal_args = [timestamps, width, height, corrects, incorrects, directory, table]
 
-    t0 = Thread(target=power_plot, args=('deltas', deltas, *universal_args))
-    t1 = Thread(target=power_plot, args=('thetas', thetas, *universal_args))
-    t2 = Thread(target=power_plot, args=('alphas', alphas, *universal_args))
-    t3 = Thread(target=power_plot, args=('betas', betas,  *universal_args))
-    t4 = Thread(target=power_plot, args=('gammas', gammas, *universal_args))
+    p0 = Process(target=power_plot, args=('deltas', deltas, *universal_args))
+    p1 = Process(target=power_plot, args=('thetas', thetas, *universal_args))
+    p2 = Process(target=power_plot, args=('alphas', alphas, *universal_args))
+    p3 = Process(target=power_plot, args=('betas', betas, *universal_args))
+    p4 = Process(target=power_plot, args=('gammas', gammas, *universal_args))
 
-    t5 = Thread(target=power_plot, args=('smooth_deltas', smooth_deltas, *universal_args))
-    t6 = Thread(target=power_plot, args=('smooth_thetas', smooth_thetas, *universal_args))
-    t7 = Thread(target=power_plot, args=('smooth_alphas', smooth_alphas, *universal_args))
-    t8 = Thread(target=power_plot, args=('smooth_betas', smooth_betas, *universal_args))
-    t9 = Thread(target=power_plot, args=('smooth_gammas', smooth_gammas, *universal_args))
+    p5 = Process(target=power_plot, args=('smooth_deltas', smooth_deltas, *universal_args))
+    p6 = Process(target=power_plot, args=('smooth_thetas', smooth_thetas, *universal_args))
+    p7 = Process(target=power_plot, args=('smooth_alphas', smooth_alphas, *universal_args))
+    p8 = Process(target=power_plot, args=('smooth_betas', smooth_betas, *universal_args))
+    p9 = Process(target=power_plot, args=('smooth_gammas', smooth_gammas, *universal_args))
 
-    t10 = Thread(target=ratio_plot, args=('alpha_over_delta', alpha_over_delta, ceiling, *universal_args))
-    t12 = Thread(target=ratio_plot, args=('beta_over_theta', beta_over_theta, ceiling, *universal_args))
-    t13 = Thread(target=ratio_plot, args=('theta_over_alpha', theta_over_alpha, ceiling, *universal_args))
-    t14 = Thread(target=ratio_plot, args=('gamma_over_beta', gamma_over_beta, ceiling, *universal_args))
-
-    thread_pool = [t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14]
+    prefix = str(ceiling)
+    p10 = Process(target=ratio_plot, args=(prefix + '_alpha_over_delta', alpha_over_delta, ceiling, *universal_args))
+    p11 = Process(target=ratio_plot, args=(prefix + '_beta_over_theta', beta_over_theta, ceiling, *universal_args))
+    p12 = Process(target=ratio_plot, args=(prefix + '_theta_over_alpha', theta_over_alpha, ceiling, *universal_args))
+    p13 = Process(target=ratio_plot, args=(prefix + '_gamma_over_beta', gamma_over_beta, ceiling, *universal_args))
     
-    if cpu_count >= 3:
-        processors = cpu_count() - 1
-    else:
-        processors = 1
-
-    running_threads = []
-    for x in range(processors-1):
-        try:
-            thread_pool[x].start()
-            running_threads.append(thread_pool[x])
-            thread_pool.remove(thread_pool[x])
-        except IndexError:
-            break
-    
-    while thread_pool:
-        sleep(1)
-        for x in running_threads:
-            if not x.is_alive():
-                running_threads.remove(x)
-                thread_pool[0].start()
-                running_threads.append(thread_pool[0])
-                thread_pool.remove(thread_pool[0])
-                break
-    for x in running_threads:
-        x.join()
+    """
+    the point here is to reduce RAM use,
+    which can get pretty out of hand if
+    these aren't spawned in their own sub-processes
+    and run one at a time
+    """
+    processes = [p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13]
+    for p in processes:
+        p.start()
+        p.join()
     
     try:
         curs.close()
@@ -267,4 +235,14 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    parser = ArgumentParser()
+    parser.add_argument('filepath', nargs='?', default=None)
+    parser.add_argument('-c', '--ceiling', nargs='?', type=int, default=2)
+    args = parser.parse_args()
+
+    if args.filepath == None or not os.path.isfile(args.filepath):
+        filepath = input('Enter the full (absolute or relative) filepath to the pickled neurofeedback file you wish to analyze:\n')
+    else:
+        filepath = args.filepath
+    
+    main(filepath, args.ceiling)
