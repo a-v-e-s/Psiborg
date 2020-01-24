@@ -1,4 +1,4 @@
-import serial, time
+import serial, time, pickle
 import matplotlib.pyplot as plt
 
 
@@ -28,12 +28,12 @@ def hr_monitor(name, start_time, heart_child=None, heart_lock=None):
         siri.flushInput()
     except NameError:
         if heart_child:
-            heart_child.send('Fail')
+            heart_child.send(False)
             heart_lock.release()
-        raise RuntimeError('Failed to find ECG stream.')
+        raise RuntimeError('Failed to find EKG stream.')
     else:
         if heart_child:
-            heart_child.send('Begin!')
+            heart_child.send(True)
             heart_lock.release()
     #
     # here we go!
@@ -44,6 +44,7 @@ def hr_monitor(name, start_time, heart_child=None, heart_lock=None):
                     print('Parent says Done!')
                     break
         
+        data = {}
         bite = siri.read_until(terminator=b'\n')
         try:
             value = int(bite[1:4])
@@ -53,11 +54,13 @@ def hr_monitor(name, start_time, heart_child=None, heart_lock=None):
         if bite.startswith(b'S'):
             charge_times.append(now)
             charge_values.append(value)
+            data[now] = bite[:4]
         elif bite.startswith(b'B'):
             pulse_times.append(now)
             pulse_values.append(value)
+            data[now] = bite[:4]
         elif bite.startswith(b'Q'):
-            try:
+            try: # try to get rid of crap input:
                 if value < (ibi_values[-1] * 0.67):
                     pulse_times.pop()
                     pulse_values.pop()
@@ -68,26 +71,43 @@ def hr_monitor(name, start_time, heart_child=None, heart_lock=None):
                 pass
             ibi_times.append(now)
             ibi_values.append(value)
+            data[now] = bite[:4]
         else:
             print('Received byte of unknown type.')
 
-    siri.close()
+    # could this line be the reason my laptop was freezing??
+    #siri.close()
 
-    directory = 'EEGs/' + name.get() + '/zener/'
+    if heart_child:
+        directory = 'Biofeedback/' + name.get().replace(' ', '_') + '/zener/' + start_time + '/'
+    else:
+        directory = 'Biofeedback/' + name.get().replace(' ', '_') + '/' + start_time + '/'
+    
     plt.plot(charge_times, charge_values)
     plt.suptitle('Charge')
-    plt.savefig(directory + start_time + '_ecg')
+    plt.savefig(directory + '_ekg')
     plt.plot(pulse_times, pulse_values)
     plt.suptitle('Pulse Rate')
-    plt.savefig(directory + start_time + '_pulses')
+    plt.savefig(directory + '_pulses')
     plt.plot(ibi_times, ibi_values)
     plt.suptitle('Inter-Beat Interval')
-    plt.savefig(directory + start_time + '_IBIs')
+    plt.savefig(directory + '_IBIs')
+
+    pkl_name = directory + 'ekg.pkl'
+    with open(pkl_name, 'wb') as f:
+        pickle.dump(data, f)
 
 
 if __name__ == '__main__':
-    from tkinter import StringVar
-    name = StringVar()
-    name.set('Jon David')
+    import tkinter, os
     from datetime import datetime
-    hr_monitor(name, str(datetime.now()).replace(' ', '_'))
+    root = tkinter.Tk()
+    name = tkinter.StringVar(root)
+    name.set('Jon David')
+    start_time = str(datetime.now()).replace(' ', '_')[:-7]
+    
+    if name.get().replace(' ', '_') not in os.listdir('Biofeedback'):
+        os.mkdir('Biofeedback/' + name.get().replace(' ', '_'))
+    os.mkdir('Biofeedback/' + name.get().replace(' ', '_') + '/' + start_time)
+
+    hr_monitor(name, start_time)

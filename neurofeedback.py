@@ -67,7 +67,7 @@ def feedback(name, start_time, brain_child=None, brain_lock=None):
     streams = resolve_byprop('type', 'EEG', timeout=2)
     if len(streams) == 0:
         if brain_child:
-            brain_child.send('Fail')
+            brain_child.send(False)
             brain_lock.release()
         raise RuntimeError('Can\'t find EEG stream.')
 
@@ -110,7 +110,7 @@ def feedback(name, start_time, brain_child=None, brain_lock=None):
     try:
         # The following loop acquires data, computes band powers, and calculates neurofeedback metrics based on those band powers
         if brain_child:
-            brain_child.send('Begin!')
+            brain_child.send(True)
             brain_lock.release()
         while True:
             if brain_child:
@@ -174,17 +174,27 @@ def feedback(name, start_time, brain_child=None, brain_lock=None):
 
 def save_and_exit(name, start_time, data):
     print('Saving and Closing!')
-    pkl_name = 'EEGs/' + name.get().replace(' ', '_') + '/zener/' + start_time + '.pkl'
+
+    if __name__ == '__main__':
+        pkl_name = 'Biofeedback'/ + name.get().replace(' ', '_') + '/' + start_time + '/EEG.pkl'
+    else:
+        pkl_name = 'Biofeedback/' + name.get().replace(' ', '_') + '/zener/' + start_time + '/EEG.pkl'
+    
     with open(pkl_name, 'wb') as f:
         pickle.dump(data, f)
     exit()
 
 
 if __name__ == '__main__':
-    import tkinter
+    import tkinter, os
     from datetime import datetime
     root = tkinter.Tk()
     name = tkinter.StringVar(root)
     name.set('Jon David')
-    start_time = str(datetime.now()).replace(' ', '_')
+    start_time = str(datetime.now()).replace(' ', '_')[:-7]
+    
+    if name.get().replace(' ', '_') not in os.listdir('Biofeedback'):
+        os.mkdir('Biofeedback/' + name.get().replace(' ', '_'))
+    os.mkdir('Biofeedback/' + name.get().replace(' ', '_') + start_time)
+
     feedback(name, start_time)

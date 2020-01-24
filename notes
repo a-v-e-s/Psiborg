@@ -1,9 +1,8 @@
-#! first make sure muse is connected via bluetooth, and arduino connected via USB
-
 =========================================================================================================================================
 
 # commands to enter to begin streaming, recording, and viewing muse data:
 #
+# if streaming hr data via USB:
 $ sudo chown crowbar:crowbar /dev/ttyACM0
 #
 $ python3 -m muselsl stream
@@ -13,17 +12,11 @@ $ python3 -m muselsl stream
 $ python3 -m muselsl view -b Qt5Agg
 # -b Qt5Agg option necessary to change the backend on blacktop; may not be necessary on other machines.
 #
-# then once the graphs have stabilized, in EEGs repo:
+# then once the graphs have stabilized:
 $ python3 -m muselsl record -d 1800 # or whatever number of seconds you want to record for
+# am i really ever going to use this data though? It's pretty large...
 #
 # then start the game!
-$ python3 master.py
+$ python3 games.py
 
 ==========================================================================================================================================
-
-Need a gui for examining eeg data with graphs
-
-Need to figure out the math of what's going on and why delta is always > theta > alpha > beta > gamma,
-as though i was always asleep while recording.
-Is it the math or is it the muse that is crappy?
-
