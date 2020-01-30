@@ -142,3 +142,7 @@ class Game():
         db.commit()
         curs.close()
         db.close()
+
+
+if __name__ == '__main__':
+    pass

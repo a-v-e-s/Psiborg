@@ -18,5 +18,7 @@ $ python3 -m muselsl record -d 1800 # or whatever number of seconds you want to 
 #
 # then start the game!
 $ python3 games.py
+# or:
+$ python3 Psiborg.py
 
 ==========================================================================================================================================

@@ -192,6 +192,8 @@ def main(filepath, ceiling):
     if table is not None:
         corrects = curs.execute('select timestamp from ' + table + ' where Correct=1;').fetchall()
         incorrects = curs.execute('select timestamp from ' + table + ' where Correct=0;').fetchall()
+    else:
+        corrects, incorrects = None, None
 
     width = len(timestamps) // 5
     height = width // 5

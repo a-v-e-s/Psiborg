@@ -88,13 +88,13 @@ def compute_band_powers(eegdata, fs):
     # SPECTRAL FEATURES
     # Average of band powers
     # Delta <4
-    ind_delta, = np.where(f < 4)
+    ind_delta, = np.where((f >= 1) & (f < 4))
     meanDelta = np.mean(PSD[ind_delta, :], axis=0)
     # Theta 4-8
-    ind_theta, = np.where((f >= 4) & (f <= 8))
+    ind_theta, = np.where((f >= 4) & (f < 8))
     meanTheta = np.mean(PSD[ind_theta, :], axis=0)
     # Alpha 8-12
-    ind_alpha, = np.where((f >= 8) & (f <= 12))
+    ind_alpha, = np.where((f >= 8) & (f < 12))
     meanAlpha = np.mean(PSD[ind_alpha, :], axis=0)
     # Beta 12-30
     ind_beta, = np.where((f >= 12) & (f < 30))

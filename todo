@@ -10,10 +10,6 @@ interface {
 };
 
 heartrate {
-    {stop laptop from freezing at the end of game while gathering heartrate data.
-        Do I need to axe windows and install linux on the internal ssd?
-        I'll do it if I have to. eff microsoft.};
-
     {fix hr data gathering because more than half of the time it is crap.};
 
     {jupyter notebook for examining hr data};

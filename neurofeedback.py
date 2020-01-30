@@ -166,7 +166,6 @@ def feedback(name, start_time, brain_child=None, brain_lock=None):
                 ]
             }
             data.append(bands)
-            #yield data
 
     except KeyboardInterrupt:
         save_and_exit(name, start_time, data)
@@ -176,7 +175,7 @@ def save_and_exit(name, start_time, data):
     print('Saving and Closing!')
 
     if __name__ == '__main__':
-        pkl_name = 'Biofeedback'/ + name.get().replace(' ', '_') + '/' + start_time + '/EEG.pkl'
+        pkl_name = 'Biofeedback/' + name.get().replace(' ', '_') + '/' + start_time + '/EEG.pkl'
     else:
         pkl_name = 'Biofeedback/' + name.get().replace(' ', '_') + '/zener/' + start_time + '/EEG.pkl'
     
@@ -189,12 +188,13 @@ if __name__ == '__main__':
     import tkinter, os
     from datetime import datetime
     root = tkinter.Tk()
-    name = tkinter.StringVar(root)
-    name.set('Jon David')
+    name_ = tkinter.StringVar(root)
+    name = input('Enter your name here:\n').replace(' ', '_')
+    name_.set(name)
     start_time = str(datetime.now()).replace(' ', '_')[:-7]
     
-    if name.get().replace(' ', '_') not in os.listdir('Biofeedback'):
-        os.mkdir('Biofeedback/' + name.get().replace(' ', '_'))
-    os.mkdir('Biofeedback/' + name.get().replace(' ', '_') + start_time)
+    if name not in os.listdir('Biofeedback'):
+        os.mkdir('Biofeedback/' + name)
+    os.mkdir('Biofeedback/' + name + '/' + start_time)
 
-    feedback(name, start_time)
+    feedback(name_, start_time)

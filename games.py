@@ -18,6 +18,7 @@ class Games():
         name = tk.Entry(root, width=50, bg='white', fg='black')
         name.grid(row=1, column=2, columnspan=3)
 
+        y = 5
         mode = tk.IntVar()
         l_type = tk.Label(root, text='Game Options:')
         l_type.grid(row=2, column=1, columnspan=4)
@@ -56,10 +57,10 @@ class Games():
         length = tk.Spinbox(root, textvariable=game_length, width=5, from_=25, to=250, increment=25)
         length.grid(row=9, column=3, columnspan=2, padx=5, pady=y)
 
-        start = tk.Button(root, text='Start Test!', command=partial(self.validate, mode, game_length eeg, record, ekg, name, mood))
-        start.grid(row=9, column=2)
+        start = tk.Button(root, text='Start Test!', command=partial(self.validate, mode, game_length, eeg, record, ekg, name, mood))
+        start.grid(row=10, column=2)
         stop = tk.Button(root, text='Quit', command=root.destroy)
-        stop.grid(row=9, column=3)
+        stop.grid(row=10, column=3)
 
         name.focus_set()
         root.mainloop()
