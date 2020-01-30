@@ -1,5 +1,7 @@
 #!/bin/bash
 
+mkdir Biofeedback
+
 touch db.sqlite
 
 sqlite3 db.sqlite "BEGIN TRANSACTION;

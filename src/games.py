@@ -11,7 +11,7 @@ from datetime import datetime
 class Games():
     def __init__(self):
         root = tk.Tk()
-        root.title('User Panel')
+        root.title('Control Panel')
 
         l_name = tk.Label(root, text='Name: ')
         l_name.grid(row=1, column=1)
