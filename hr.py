@@ -42,6 +42,7 @@ def hr_monitor(name, start_time, heart_child=None, heart_lock=None):
         else: start = time.time()
     #
     # here we go!
+    data = {}
     while True:
         if heart_child:
             if heart_child.poll():
@@ -53,7 +54,6 @@ def hr_monitor(name, start_time, heart_child=None, heart_lock=None):
             if now - start > 60:
                 break
         
-        data = {}
         bite = siri.read_until(terminator=b'\n')
         try:
             value = int(bite[1:4])

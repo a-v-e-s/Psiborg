@@ -17,7 +17,7 @@ class Game():
 
         root = tk.Tk()
         root.title('Game')
-        att = tk.Label(root, text=str(self.attempts)+'/25')
+        att = tk.Label(root, text=str(self.attempts)+'/'+str(self.length))
 
         img_circle = tk.PhotoImage(master=root, file="images/circle.gif")
         self.options.append(img_circle)
@@ -89,7 +89,7 @@ class Game():
             success = 0
             #print('Dunce!')
         self.data[self.attempts] = [str(success), str(timestamp)]
-        att.configure(text=str(self.attempts)+'/25')
+        att.configure(text=str(self.attempts)+'/'+str(self.length))
         if self.attempts == self.length:
             self.record_data(mode, name, mood, start_time)
             root.destroy()

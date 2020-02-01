@@ -1,8 +1,4 @@
 ================================================================================================================
-{Need to figure out the math of what's going on and why delta is always > theta > alpha > beta > gamma,
-    as though i was always asleep while recording.
-    Is it the math or is it the muse that is crappy?};
-
 interface {
     {change name of games.py to master.py or control_panel.py or psiborg.py?
         make games.py a subordinate of master.py / et al?};
