@@ -1,16 +1,45 @@
 ================================================================================================================
+
 interface {
-    {change name of games.py to master.py or control_panel.py or psiborg.py?
-        make games.py a subordinate of master.py / et al?};
+    {make games.py a subordinate of master.py / et al};
     {Need a gui for examining eeg data with graphs};
 };
 
 heartrate {
     {fix hr data gathering because more than half of the time it is crap.};
 
-    {jupyter notebook for examining hr data};
+    {jupyter notebook for examining hr data;
+        cut data up into chunks, make image for each, string the images together};
 };
+
+Implement GSR;
+Try to get GSR and HR data to both be gathered by the same arduino.
 
 {fix your sqlite database and data structure in general.
     create a new db if you need to.};
+
 ================================================================================================================
+
+probability distribution for any given number of correct guesses
+
+regression line & coefficient of determination for:  {
+    gamma band power and odds of correct guess,
+    beta band power and odds of correct guess,
+    alpha band power and odds of correct guess,
+    theta band power and odds of correct guess,
+    delta band power and odds of correct guess,
+    heart rate and odds of correct guess,
+    HRV and odds of correct guess,
+    GSR and odds of correct guess,
+}
+
+correlation and covariance between:  {
+    gamma band power and odds of correct guess,
+    beta band power and odds of correct guess,
+    alpha band power and odds of correct guess,
+    theta band power and odds of correct guess,
+    delta band power and odds of correct guess,
+    heart rate and odds of correct guess,
+    HRV and odds of correct guess,
+    GSR and odds of correct guess,
+}
