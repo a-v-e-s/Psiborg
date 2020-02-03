@@ -9,6 +9,8 @@ class Game():
         self.brain_parent = brain_parent
         if heart_parent is not None:
             self.heart_parent = heart_parent
+        else:
+            self.heart_parent = None
         print('Creating Game now!')
         self.attempts = 0
         self.length = int(game_length.get())
